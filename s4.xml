@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+Name:           s4
+Description:    Servidor adicional
+
+Departamento de Ingenieria de Sistemas Telematicos (DIT)
+Universidad Politecnica de Madrid
+SPAIN
+
+-->
+
+<vnx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="/usr/share/xml/vnx/vnx-2.00.xsd">
+  <global>
+    <version>2.0</version>
+    <scenario_name>cdps_pfinal_s4</scenario_name>
+    <ssh_key>/root/.ssh/id_rsa.pub</ssh_key>
+    <ssh_key>~/.ssh/id_rsa.pub</ssh_key>
+    <automac offset="1"/>
+    <!--vm_mgmt type="none" /-->
+    <vm_mgmt type="private" network="10.250.0.0" mask="24" offset="64">
+       <host_mapping />
+    </vm_mgmt>
+    <vm_defaults>
+        <console id="0" display="no"/>
+        <console id="1" display="yes"/>
+    </vm_defaults>
+  </global>
+
+  <net name="LAN3" mode="virtual_bridge"/>  
+  <net name="LAN4" mode="virtual_bridge"/>
+  <net name="virbr0" mode="virtual_bridge"/>
+
+  <vm name="s4" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN3">
+      <ipv4>20.2.3.14/24</ipv4>
+    </if>
+    <if id="2" net="LAN4">
+      <ipv4>20.2.4.14/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="20.2.3.1">20.2.0.0/16</route>   
+    <exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+   <filetree seq="on_boot" root="/root/">conf/hosts</filetree>
+   <exec seq="on_boot" type="verbatim">cat /root/hosts >> /etc/hosts; rm /root/hosts; </exec>
+  </vm>
+
+</vnx>
